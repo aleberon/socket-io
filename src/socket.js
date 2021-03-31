@@ -1,16 +1,24 @@
-module.exports = (io) => {
-    const messages = [];
-    io.on('connection', (socket) => {
-        console.log('Usuario conectado');
-        io.emit('messages', messages);
+const serverSocketIO = (io) => {
+  const messages = [];
+  io.on("connection", (socket) => {
+    console.log(socket.id);
+    console.log(`Usuario conectado con id: ${socket.id}`);
+    io.emit("messages", messages);
 
-        socket.on('message', (data) => {
-            messages.push(data);            
-            io.emit('messages', messages);
-        })
+    // Escucha el evento personalizado
+    socket.on("message", (data) => {
+      console.log(data);
+      messages.push(data);
 
-        socket.on('disconnect', () => {
-            console.log('Usuario desconectado');
-        })
-    })
-}
+      // Emito un evento personalizado "messages" el cual el cliente esta a la escucha
+      io.emit("messages", messages);
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.log("Usuario desconectado");
+      console.log(reason);
+    });
+  });
+};
+
+module.exports = serverSocketIO;
